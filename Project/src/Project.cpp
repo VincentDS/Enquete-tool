@@ -7,12 +7,24 @@
 //============================================================================
 
 #include <iostream>
+#include <fstream> //for file-access
+#include <string>
 using namespace std;
 
-void asker()
+void asker(ifstream& specification, ofstream& answers) {
+
+	string result;
+
+	while (!specification.eof()) {
+	getline(specification, result);
+	cout << result << endl;
+	}
+}
 
 
 int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	ifstream specification("src/enquetespecificatie.txt");
+	ofstream answers("src/antwoordbestand.txt");
+	asker(specification, answers);
 	return 0;
 }
