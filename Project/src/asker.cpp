@@ -13,7 +13,8 @@
 using namespace std;
 
 
-bool correctarguments(int argc, const char *argv[]) { //checks if the 2 correct files are passed.
+//checks if the 2 correct files are passed.
+bool correctarguments(int argc, const char *argv[]) {
 	if (argc != 3) {
 		cout << "invalid amount of arguments" <<endl;
 		return false;
@@ -28,16 +29,18 @@ bool correctarguments(int argc, const char *argv[]) { //checks if the 2 correct 
 	}
 }
 
-
+//prints intro with the filenames
 void intro(const char *argv[]) {
 	cout << "vdeschut@vub.ac.be " << "taak1 " << argv[1] << " " << argv[2] << endl;
 }
 
+//prints outro with the filename to which the answers are passed
 void outro(const char *argv[]) {
 	cout << "Antwoordbestand weggeschreven naar \"" << argv[2] << "\"." << endl;
 }
 
 
+//checks the amount of questions in the enquete
 int numberofsteps(string stepsstring) {
 	string tmp;  // temporary string to insert "STEPS" before we can acquire the steps integer.
 	int steps;
@@ -45,6 +48,42 @@ int numberofsteps(string stepsstring) {
 	stepsstream >> tmp;
 	stepsstream >> steps;
 	return steps;
+}
+
+
+string GetNthStringElement(int n, string input){
+	istringstream inputstream(input);
+	string result;
+	for (int i=0; i<n; i++) {
+		inputstream >> result;
+	}
+	return result;
+}
+
+string GetSubstring(int n, string input){
+	istringstream inputstream(input);
+	string result;
+	for (int i=0; i<(n-1); i++) {
+		inputstream >> result;
+	}
+	getline(inputstream, result);
+	return result;
+}
+
+string questiontype(string question) {
+	istringstream questionstream(question);
+	string questionnumber;
+	string questiontype;
+	questionstream >> questionnumber;
+	questionstream >> questiontype;
+	return questiontype;
+}
+
+void textparser(string question) {
+	string questionnumber(GetNthStringElement(1, question));
+	string questiontext(GetSubstring(3, question));
+
+	cout << questiontext << endl;
 }
 
 
@@ -56,20 +95,36 @@ void asker(ifstream& specification, ofstream& answers) {
 	string questions;
 	string newline("\n");
 
+	string question;
+
 	getline(specification, version);
 	getline(specification, id);
 	getline(specification, steps);
-	while (!specification.eof()) {
-	getline(specification, questions);
-	}
-
 
 	cout << "Deze enquete bestaat uit " << numberofsteps(steps) << " vragen." << endl << endl;
+	answers << id << newline;
 
-	answers << id;
-	answers << newline;
 
-	cout << questions << endl;
+	while (!specification.eof()) {
+	getline(specification, question);
+	if (questiontype(question) == "TEXT") {
+		textparser(question);
+	}
+	else if (questiontype(question) == "CHOICE") {
+		cout << "this is choice" << endl;
+	}
+	else {
+		cout << "invalid question type." << endl;
+	}
+	}
+
+//	cout << "Vraag " << questionparser(questions, "number") <<": " << questionparser(questions, "text") << endl;
+//	while (getline(cin, question)) {
+//		answers << questionparser(questions, "number") << " " << question << endl;
+//		break;
+//	}
+
+
 
 
 	cout << "Bedankt voor je deelname." << endl;
@@ -81,9 +136,9 @@ int main(int argc, const char *argv[]) {
 		ifstream specification(argv[1]);
 		ofstream answers(argv[2]);
 
-		intro(argv); //prints intro with the filenames
+		intro(argv);
 		asker(specification, answers);
-		outro(argv); //prints outro with the filename to which the answers are passed
+		outro(argv);
 	}
 	return 0;
 }
