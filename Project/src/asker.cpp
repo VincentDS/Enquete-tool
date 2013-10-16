@@ -50,7 +50,6 @@ int numberofsteps(string stepsstring) {
 	return steps;
 }
 
-
 string GetNthStringElement(int n, string input){
 	istringstream inputstream(input);
 	string result;
@@ -79,11 +78,34 @@ string questiontype(string question) {
 	return questiontype;
 }
 
-void textparser(string question) {
+void PrintQuestion(string number, string text){
+	cout << "Vraag " << number <<": " << text << endl;
+}
+
+void WriteUserInput(string number, ofstream& answers){
+	string userinput;
+	while (getline(cin, userinput)) {
+		answers << number << " " << userinput << endl;
+		break;
+	}
+}
+
+void textparser(string question, ofstream& answers) {
 	string questionnumber(GetNthStringElement(1, question));
 	string questiontext(GetSubstring(3, question));
 
-	cout << questiontext << endl;
+	PrintQuestion(questionnumber, questiontext);
+	WriteUserInput(questionnumber, answers);
+}
+
+void choiceparser(string question, ofstream& answers) {
+	string questionnumber(GetNthStringElement(1, question));
+	string numberofchoices(GetNthStringElement(3, question));
+	string questiontext(GetSubstring(4, question));
+
+	PrintQuestion(questionnumber, questiontext);
+	//PrintChoices(question, numberofchoices);
+	WriteUserInput(questionnumber, answers);
 }
 
 
@@ -92,9 +114,6 @@ void asker(ifstream& specification, ofstream& answers) {
 	string version;
 	string id;
 	string steps;
-	string questions;
-	string newline("\n");
-
 	string question;
 
 	getline(specification, version);
@@ -102,29 +121,21 @@ void asker(ifstream& specification, ofstream& answers) {
 	getline(specification, steps);
 
 	cout << "Deze enquete bestaat uit " << numberofsteps(steps) << " vragen." << endl << endl;
-	answers << id << newline;
+	answers << id << endl;
 
 
 	while (!specification.eof()) {
 	getline(specification, question);
 	if (questiontype(question) == "TEXT") {
-		textparser(question);
+		//textparser(question, answers);
 	}
 	else if (questiontype(question) == "CHOICE") {
-		cout << "this is choice" << endl;
+		choiceparser(question, answers);
 	}
 	else {
 		cout << "invalid question type." << endl;
 	}
 	}
-
-//	cout << "Vraag " << questionparser(questions, "number") <<": " << questionparser(questions, "text") << endl;
-//	while (getline(cin, question)) {
-//		answers << questionparser(questions, "number") << " " << question << endl;
-//		break;
-//	}
-
-
 
 
 	cout << "Bedankt voor je deelname." << endl;
