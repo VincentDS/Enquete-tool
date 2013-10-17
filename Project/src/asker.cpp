@@ -29,18 +29,15 @@ bool CorrectArguments(int argc, const char *argv[]) {
 	}
 }
 
-
 //prints intro with the filenames
 void Intro(const char *argv[]) {
 	cout << "vdeschut@vub.ac.be " << "taak1 " << argv[1] << " " << argv[2] << endl;
 }
 
-
 //prints outro with the filename to which the answers are passed
 void Outro(const char *argv[]) {
 	cout << "Antwoordbestand weggeschreven naar \"" << argv[2] << "\"." << endl;
 }
-
 
 //checks the amount of questions in the enquete
 int NumberOfSteps(string stepsstring) {
@@ -107,7 +104,12 @@ void PrintQuestion(string number, string text){
 //gives the amount of choices of a choice question
 int AmountOfChoices(string choicequestion){
 	string numberofchoices(GetNthStringElement(3, choicequestion));
-	istringstream buffer(numberofchoices); //making integer from string
+	return StringToInteger(numberofchoices);
+}
+
+//making integer from string
+int StringToInteger(string string) {
+	istringstream buffer(string);
 	int value;
 	buffer >> value;
 	return value;
@@ -123,8 +125,9 @@ void PrintChoices(ifstream& specification, string question){
 	}
 }
 
+/*
 //writes the user input to the answers file.
-void WriteUserInput(string number, ofstream& answers){
+void WriteUserInput(string number, ofstream& answers, int inputtype){
 	string userinput;
 	while (getline(cin, userinput)) {
 		answers << number << " " << userinput << endl;
@@ -132,7 +135,43 @@ void WriteUserInput(string number, ofstream& answers){
 	}
 	cout << "OK." << endl;
 }
+*/
 
+bool ValidUserInput(string question, string userinput) {
+	string questiontype(GetNthStringElement(2, question));
+	if (questiontype == "TEXT") {
+		if (userinput != "" || userinput != " ") {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (questiontype == "CHOICE") {
+		int inputinteger(StringToInteger(userinput));
+		int amountofchoices(AmountOfChoices(question));
+		if ((inputinteger > 0) && (inputinteger <= amountofchoices)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+}
+
+void WriteUserInput(string question, ofstream& answers){
+	string questionnumber(GetNthStringElement(1, question));
+	string userinput;
+	getline(cin, userinput);
+	if (ValidUserInput(question, userinput)) {
+		answers << questionnumber << " " << userinput << endl;
+		cout << "OK." << endl;
+	}
+	else {
+		cout << "Ongeldige input, gelieve opnieuw te proberen." << endl;
+		WriteUserInput(question, answers);
+	}
+}
 
 void asker(ifstream& specification, ofstream& answers) {
 	string version;
@@ -148,16 +187,15 @@ void asker(ifstream& specification, ofstream& answers) {
 
 	while (!specification.eof()) {
 		getline(specification, question);
-		string questionnumber(GetNthStringElement(1, question));
 
 		if (QuestionType(question) == "TEXT") {
 			TextParser(question);
-			WriteUserInput(questionnumber, answers);
+			WriteUserInput(question, answers);
 		}
 		else if (QuestionType(question) == "CHOICE") {
 			ChoiceParser(question);
 			PrintChoices(specification, question);
-			WriteUserInput(questionnumber, answers);
+			WriteUserInput(question, answers);
 		}
 		else {
 			cout << "invalid question type." << endl;

@@ -19,6 +19,7 @@ void TextParser(std::string question);
 void ChoiceParser(std::string question);
 void PrintQuestion(std::string number, std::string text);
 int AmountOfChoices(std::string question);
+int StringToInteger(std::string string);
 void PrintChoices(std::ifstream& specification, std::string question);
 void asker(std::ifstream& specification, std::ofstream& answers);
 
