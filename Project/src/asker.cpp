@@ -90,22 +90,37 @@ void WriteUserInput(string number, ofstream& answers){
 	}
 }
 
-void textparser(string question, ofstream& answers) {
+void TextParser(string question) {
 	string questionnumber(GetNthStringElement(1, question));
 	string questiontext(GetSubstring(3, question));
 
 	PrintQuestion(questionnumber, questiontext);
-	WriteUserInput(questionnumber, answers);
 }
 
-void choiceparser(string question, ofstream& answers) {
+void ChoiceParser(string question) {
 	string questionnumber(GetNthStringElement(1, question));
 	string numberofchoices(GetNthStringElement(3, question));
 	string questiontext(GetSubstring(4, question));
 
 	PrintQuestion(questionnumber, questiontext);
 	//PrintChoices(question, numberofchoices);
-	WriteUserInput(questionnumber, answers);
+}
+
+int AmountOfChoices(string question){
+	string numberofchoices(GetNthStringElement(3, question));
+	istringstream buffer(numberofchoices); //making integer from string
+	int value;
+	buffer >> value;
+	return value;
+}
+
+void PrintChoices(ifstream& specification, string question){
+	int choices(AmountOfChoices(question));
+	string result;
+	for (int i=0; i<choices; i++) {
+		getline(specification, result);
+		cout << result << endl;
+	}
 }
 
 
@@ -125,16 +140,21 @@ void asker(ifstream& specification, ofstream& answers) {
 
 
 	while (!specification.eof()) {
-	getline(specification, question);
-	if (questiontype(question) == "TEXT") {
-		//textparser(question, answers);
-	}
-	else if (questiontype(question) == "CHOICE") {
-		choiceparser(question, answers);
-	}
-	else {
-		cout << "invalid question type." << endl;
-	}
+		getline(specification, question);
+		string questionnumber(GetNthStringElement(1, question));
+
+		if (questiontype(question) == "TEXT") {
+			TextParser(question);
+			WriteUserInput(questionnumber, answers);
+		}
+		else if (questiontype(question) == "CHOICE") {
+			ChoiceParser(question);
+			PrintChoices(specification, question);
+			WriteUserInput(questionnumber, answers);
+		}
+		else {
+			cout << "invalid question type." << endl;
+		}
 	}
 
 
