@@ -14,7 +14,7 @@ using namespace std;
 
 
 //checks if the 2 correct files are passed.
-bool correctarguments(int argc, const char *argv[]) {
+bool CorrectArguments(int argc, const char *argv[]) {
 	if (argc != 3) {
 		cout << "invalid amount of arguments" <<endl;
 		return false;
@@ -29,19 +29,21 @@ bool correctarguments(int argc, const char *argv[]) {
 	}
 }
 
+
 //prints intro with the filenames
-void intro(const char *argv[]) {
+void Intro(const char *argv[]) {
 	cout << "vdeschut@vub.ac.be " << "taak1 " << argv[1] << " " << argv[2] << endl;
 }
 
+
 //prints outro with the filename to which the answers are passed
-void outro(const char *argv[]) {
+void Outro(const char *argv[]) {
 	cout << "Antwoordbestand weggeschreven naar \"" << argv[2] << "\"." << endl;
 }
 
 
 //checks the amount of questions in the enquete
-int numberofsteps(string stepsstring) {
+int NumberOfSteps(string stepsstring) {
 	string tmp;  // temporary string to insert "STEPS" before we can acquire the steps integer.
 	int steps;
 	istringstream stepsstream(stepsstring);
@@ -49,6 +51,17 @@ int numberofsteps(string stepsstring) {
 	stepsstream >> steps;
 	return steps;
 }
+
+
+string QuestionType(string question) {
+	istringstream questionstream(question);
+	string questionnumber;
+	string questiontype;
+	questionstream >> questionnumber;
+	questionstream >> questiontype;
+	return questiontype;
+}
+
 
 string GetNthStringElement(int n, string input){
 	istringstream inputstream(input);
@@ -58,6 +71,7 @@ string GetNthStringElement(int n, string input){
 	}
 	return result;
 }
+
 
 string GetSubstring(int n, string input){
 	istringstream inputstream(input);
@@ -69,26 +83,6 @@ string GetSubstring(int n, string input){
 	return result;
 }
 
-string questiontype(string question) {
-	istringstream questionstream(question);
-	string questionnumber;
-	string questiontype;
-	questionstream >> questionnumber;
-	questionstream >> questiontype;
-	return questiontype;
-}
-
-void PrintQuestion(string number, string text){
-	cout << "Vraag " << number <<": " << text << endl;
-}
-
-void WriteUserInput(string number, ofstream& answers){
-	string userinput;
-	while (getline(cin, userinput)) {
-		answers << number << " " << userinput << endl;
-		break;
-	}
-}
 
 void TextParser(string question) {
 	string questionnumber(GetNthStringElement(1, question));
@@ -97,14 +91,20 @@ void TextParser(string question) {
 	PrintQuestion(questionnumber, questiontext);
 }
 
+
 void ChoiceParser(string question) {
 	string questionnumber(GetNthStringElement(1, question));
 	string numberofchoices(GetNthStringElement(3, question));
 	string questiontext(GetSubstring(4, question));
 
 	PrintQuestion(questionnumber, questiontext);
-	//PrintChoices(question, numberofchoices);
 }
+
+
+void PrintQuestion(string number, string text){
+	cout << "Vraag " << number <<": " << text << endl;
+}
+
 
 int AmountOfChoices(string question){
 	string numberofchoices(GetNthStringElement(3, question));
@@ -114,13 +114,24 @@ int AmountOfChoices(string question){
 	return value;
 }
 
+
 void PrintChoices(ifstream& specification, string question){
 	int choices(AmountOfChoices(question));
 	string result;
-	for (int i=0; i<choices; i++) {
+	for (int i=1; i<=choices; i++) {
 		getline(specification, result);
-		cout << result << endl;
+		cout << i << ") " << result << endl;
 	}
+}
+
+
+void WriteUserInput(string number, ofstream& answers){
+	string userinput;
+	while (getline(cin, userinput)) {
+		answers << number << " " << userinput << endl;
+		break;
+	}
+	cout << "OK." << endl;
 }
 
 
@@ -135,7 +146,7 @@ void asker(ifstream& specification, ofstream& answers) {
 	getline(specification, id);
 	getline(specification, steps);
 
-	cout << "Deze enquete bestaat uit " << numberofsteps(steps) << " vragen." << endl << endl;
+	cout << "Deze enquete bestaat uit " << NumberOfSteps(steps) << " vragen." << endl << endl;
 	answers << id << endl;
 
 
@@ -143,11 +154,11 @@ void asker(ifstream& specification, ofstream& answers) {
 		getline(specification, question);
 		string questionnumber(GetNthStringElement(1, question));
 
-		if (questiontype(question) == "TEXT") {
+		if (QuestionType(question) == "TEXT") {
 			TextParser(question);
 			WriteUserInput(questionnumber, answers);
 		}
-		else if (questiontype(question) == "CHOICE") {
+		else if (QuestionType(question) == "CHOICE") {
 			ChoiceParser(question);
 			PrintChoices(specification, question);
 			WriteUserInput(questionnumber, answers);
@@ -158,18 +169,18 @@ void asker(ifstream& specification, ofstream& answers) {
 	}
 
 
-	cout << "Bedankt voor je deelname." << endl;
+	cout << endl << "Bedankt voor je deelname." << endl;
 }
 
 
 int main(int argc, const char *argv[]) {
-	if (correctarguments(argc, argv)) {
+	if (CorrectArguments(argc, argv)) {
 		ifstream specification(argv[1]);
 		ofstream answers(argv[2]);
 
-		intro(argv);
+		Intro(argv);
 		asker(specification, answers);
-		outro(argv);
+		Outro(argv);
 	}
 	return 0;
 }
