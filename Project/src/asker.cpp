@@ -9,6 +9,7 @@
 #include <fstream> //for file-access
 #include <string>
 #include <sstream>
+#include <cmath>
 #include "asker.h"
 using namespace std;
 
@@ -115,6 +116,11 @@ int StringToInteger(string string) {
 	return value;
 }
 
+//return the length of an integer (e.g. IntegerLength(35435) = 5)
+int IntegerLength(int x) {
+	return (floor(log10(abs(x))) + 1);
+}
+
 //prints all the choices of a choice question
 void PrintChoices(ifstream& specification, string question){
 	int choices(AmountOfChoices(question));
@@ -125,22 +131,11 @@ void PrintChoices(ifstream& specification, string question){
 	}
 }
 
-/*
-//writes the user input to the answers file.
-void WriteUserInput(string number, ofstream& answers, int inputtype){
-	string userinput;
-	while (getline(cin, userinput)) {
-		answers << number << " " << userinput << endl;
-		break;
-	}
-	cout << "OK." << endl;
-}
-*/
-
+//checks if the input matches with the type of question
 bool ValidUserInput(string question, string userinput) {
 	string questiontype(GetNthStringElement(2, question));
 	if (questiontype == "TEXT") {
-		if (userinput != "" || userinput != " ") {
+		if (userinput != "" && userinput != " ") {
 			return true;
 		}
 		else {
@@ -150,7 +145,9 @@ bool ValidUserInput(string question, string userinput) {
 	else if (questiontype == "CHOICE") {
 		int inputinteger(StringToInteger(userinput));
 		int amountofchoices(AmountOfChoices(question));
-		if ((inputinteger > 0) && (inputinteger <= amountofchoices)) {
+		int allowedinputlength(IntegerLength(amountofchoices)); //size of the userinput must be smaller or equal
+		//as the intergerlength of the amount of choices. (e.g. 3F will be an invalid input if there are only 4 choices)
+		if ((inputinteger > 0) && (inputinteger <= amountofchoices) && (userinput.size() <= allowedinputlength)){
 			return true;
 		}
 		else {
@@ -159,6 +156,7 @@ bool ValidUserInput(string question, string userinput) {
 	}
 }
 
+//writes the input to the answers file if it's a valid input
 void WriteUserInput(string question, ofstream& answers){
 	string questionnumber(GetNthStringElement(1, question));
 	string userinput;
