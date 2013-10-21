@@ -20,7 +20,10 @@ void ChoiceParser(std::string question);
 void PrintQuestion(std::string number, std::string text);
 int AmountOfChoices(std::string question);
 int StringToInteger(std::string string);
+std::string IntegerToString(int integer);
 void PrintChoices(std::ifstream& specification, std::string question);
+bool ValidUserInput(std::string question, std::string userinput);
+void WriteUserInput(std::string question, std::ofstream& answers);
 void asker(std::ifstream& specification, std::ofstream& answers);
 
 #define ASKER_H_

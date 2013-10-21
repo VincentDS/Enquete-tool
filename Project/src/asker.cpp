@@ -9,7 +9,6 @@
 #include <fstream> //for file-access
 #include <string>
 #include <sstream>
-#include <cmath>
 #include "asker.h"
 using namespace std;
 
@@ -116,9 +115,11 @@ int StringToInteger(string string) {
 	return value;
 }
 
-//return the length of an integer (e.g. IntegerLength(35435) = 5)
-int IntegerLength(int x) {
-	return (floor(log10(abs(x))) + 1);
+//making string from integer
+string IntegerToString(int integer) {
+	ostringstream buffer;
+	buffer << integer;
+	return buffer.str();
 }
 
 //prints all the choices of a choice question
@@ -144,10 +145,12 @@ bool ValidUserInput(string question, string userinput) {
 	}
 	else if (questiontype == "CHOICE") {
 		int inputinteger(StringToInteger(userinput));
+		string inputstring(IntegerToString(inputinteger));  //makes again a string from the string that was
+		//converted to an integer, to compare it with the userinput. if they are the same, there were no other characters
+		//than the integer in the inputstring (e.g. 3F (userinput) => 3 (inputinteger) => 3 (inputstring).
+		//userinput != inputstring). This is a bugfix when the users gives "a valid choice number"+"a random string".
 		int amountofchoices(AmountOfChoices(question));
-		int allowedinputlength(IntegerLength(amountofchoices)); //size of the userinput must be smaller or equal
-		//as the intergerlength of the amount of choices. (e.g. 3F will be an invalid input if there are only 4 choices)
-		if ((inputinteger > 0) && (inputinteger <= amountofchoices) && (userinput.size() <= allowedinputlength)){
+		if ((inputinteger > 0) && (inputinteger <= amountofchoices) && (userinput == inputstring)){
 			return true;
 		}
 		else {
