@@ -6,10 +6,13 @@
  */
 
 #include <iostream>
-#include <fstream> //for file-access
+#include <fstream>
 #include <string>
 #include <sstream>
-#include "asker.h"
+#include "question.h"
+#include "text.h"
+#include "choice.h"
+#include "userinput.h"
 using namespace std;
 
 
@@ -39,140 +42,6 @@ void Outro(const char *argv[]) {
 	cout << "Antwoordbestand weggeschreven naar \"" << argv[2] << "\"." << endl;
 }
 
-//checks the amount of questions in the enquete
-int NumberOfSteps(string stepsstring) {
-	string tmp;  //temporary string to insert "STEPS" before we can acquire the steps integer.
-	int steps;
-	istringstream stepsstream(stepsstring);
-	stepsstream >> tmp;
-	stepsstream >> steps;
-	return steps;
-}
-
-//analyzes the type of question, given a random questionline.
-string QuestionType(string question) {
-	istringstream questionstream(question);
-	string questionnumber;
-	string questiontype;
-	questionstream >> questionnumber;
-	questionstream >> questiontype;
-	return questiontype;
-}
-
-//gives the Nth word of a string
-string GetNthStringElement(int n, string input){
-	istringstream inputstream(input);
-	string result;
-	for (int i=0; i<n; i++) {
-		inputstream >> result;
-	}
-	return result;
-}
-
-//gives the resuming words of a string, starting with the nth word
-string GetSubstring(int n, string input){
-	istringstream inputstream(input);
-	string result;
-	for (int i=0; i<(n-1); i++) {
-		inputstream >> result;
-	}
-	getline(inputstream, result);
-	return result;
-}
-
-//reads a question and prints it to the console
-void TextParser(string question) {
-	string questionnumber(GetNthStringElement(1, question));
-	string questiontext(GetSubstring(3, question));
-
-	PrintQuestion(questionnumber, questiontext);
-}
-
-//idem TextParser
-void ChoiceParser(string question) {
-	string questionnumber(GetNthStringElement(1, question));
-	string questiontext(GetSubstring(4, question));
-
-	PrintQuestion(questionnumber, questiontext);
-}
-
-
-void PrintQuestion(string number, string text){
-	cout << "Vraag " << number <<": " << text << endl;
-}
-
-//gives the amount of choices of a choice question
-int AmountOfChoices(string choicequestion){
-	string numberofchoices(GetNthStringElement(3, choicequestion));
-	return StringToInteger(numberofchoices);
-}
-
-//making integer from string
-int StringToInteger(string string) {
-	istringstream buffer(string);
-	int value;
-	buffer >> value;
-	return value;
-}
-
-//making string from integer
-string IntegerToString(int integer) {
-	ostringstream buffer;
-	buffer << integer;
-	return buffer.str();
-}
-
-//prints all the choices of a choice question
-void PrintChoices(ifstream& specification, string question){
-	int choices(AmountOfChoices(question));
-	string result;
-	for (int i=1; i<=choices; i++) {
-		getline(specification, result);
-		cout << i << ") " << result << endl;
-	}
-}
-
-//checks if the input matches with the type of question
-bool ValidUserInput(string question, string userinput) {
-	string questiontype(GetNthStringElement(2, question));
-	if (questiontype == "TEXT") {
-		if (userinput != "" && userinput != " ") {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	else if (questiontype == "CHOICE") {
-		int inputinteger(StringToInteger(userinput));
-		string inputstring(IntegerToString(inputinteger));  //makes again a string from the string that was
-		//converted to an integer, to compare it with the userinput. if they are the same, there were no other characters
-		//than the integer in the inputstring (e.g. 3F (userinput) => 3 (inputinteger) => 3 (inputstring).
-		//userinput != inputstring). This is a bugfix when the users gives "a valid choice number"+"a random string".
-		int amountofchoices(AmountOfChoices(question));
-		if ((inputinteger > 0) && (inputinteger <= amountofchoices) && (userinput == inputstring)){
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-}
-
-//writes the input to the answers file if it's a valid input
-void WriteUserInput(string question, ofstream& answers){
-	string questionnumber(GetNthStringElement(1, question));
-	string userinput;
-	getline(cin, userinput);
-	if (ValidUserInput(question, userinput)) {
-		answers << questionnumber << " " << userinput << endl;
-		cout << "OK." << endl;
-	}
-	else {
-		cout << "Ongeldige input, gelieve opnieuw te proberen." << endl;
-		WriteUserInput(question, answers);
-	}
-}
 
 void asker(ifstream& specification, ofstream& answers) {
 	string version;
@@ -204,17 +73,4 @@ void asker(ifstream& specification, ofstream& answers) {
 	}
 
 	cout << endl << "Bedankt voor je deelname." << endl;
-}
-
-
-int main(int argc, const char *argv[]) {
-	if (CorrectArguments(argc, argv)) {
-		ifstream specification(argv[1]);
-		ofstream answers(argv[2]);
-
-		Intro(argv);
-		asker(specification, answers);
-		Outro(argv);
-	}
-	return 0;
 }
