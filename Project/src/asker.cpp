@@ -22,8 +22,8 @@ bool CorrectArguments(int argc, const char *argv[]) {
 		cout << "invalid amount of arguments" << endl;
 		return false;
 	}
-	else if ((strcmp(argv[1], "enquetespecificatie.txt") != 0) ||
-			(strcmp(argv[2], "antwoordbestand.txt") != 0) ) {
+	else if ((strcmp(argv[1], "enquetespecificatie.ens") != 0) ||
+			(strcmp(argv[2], "antwoordbestand.ena") != 0) ) {
 		cout << "invalid arguments passed" << endl;
 		return false;
 	}
