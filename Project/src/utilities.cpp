@@ -24,3 +24,12 @@ string IntegerToString(int integer) {
 	buffer << integer;
 	return buffer.str();
 }
+
+bool CorrectExtension(string path, string extension) {
+	if (path.substr(path.find_last_of(".")) == extension) {
+	   return true;
+	  }
+	else {
+	    return false;
+	  }
+}

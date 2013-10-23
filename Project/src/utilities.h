@@ -9,6 +9,7 @@
 
 int StringToInteger(std::string string);
 std::string IntegerToString(int integer);
+bool CorrectExtension(std::string path, std::string extension);
 
 #define UTILITIES_H_
 

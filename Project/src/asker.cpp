@@ -13,6 +13,7 @@
 #include "text.h"
 #include "choice.h"
 #include "userinput.h"
+#include "utilities.h"
 using namespace std;
 
 
@@ -22,13 +23,16 @@ bool CorrectArguments(int argc, const char *argv[]) {
 		cout << "invalid amount of arguments" << endl;
 		return false;
 	}
-	else if ((strcmp(argv[1], "enquetespecificatie.ens") != 0) ||
-			(strcmp(argv[2], "antwoordbestand.ena") != 0) ) {
-		cout << "invalid arguments passed" << endl;
-		return false;
-	}
 	else {
-		return true;
+		string enquetepath = argv[1];
+		string answerspath = argv[2];
+		if (!(CorrectExtension(enquetepath, ".ens")) || !(CorrectExtension(answerspath, ".ena"))) {
+			cout << "invalid arguments passed" << endl;
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 }
 
