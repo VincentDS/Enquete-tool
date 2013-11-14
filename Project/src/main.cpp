@@ -1,24 +1,21 @@
 /*
  * main.cpp
  *
- *  Created on: Oct 21, 2013
+ *  Created on: Nov 14, 2013
  *      Author: vincentdeschutter
  */
 
 #include <iostream>
-#include <string>
 #include <fstream>
-#include "asker.h"
+#include "editor.h"
 using namespace std;
 
 int main(int argc, const char *argv[]) {
-	if (CorrectArguments(argc, argv)) {
+	if (CorrectExtension(argv[1], ".ens")) {
 		ifstream specification(argv[1]);
-		ofstream answers(argv[2]);
-		Intro(argv);
-		asker(specification, answers);
-		Outro(argv);
+		editor(specification);
 	}
 	return 0;
 }
+
 
